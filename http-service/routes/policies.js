@@ -1,7 +1,7 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-router.get('/policies', function(req, res, next) {
+router.get('/policies', (req, res, next) => {
   res.send('respond with policies');
 });
 
