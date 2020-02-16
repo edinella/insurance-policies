@@ -16,11 +16,21 @@ services:
     build: ./http-service/
     restart: on-failure
     depends_on:
+      - policy-service
+    links:
+      - policy-service
+    ports:
+      - '8080:8080'
+  policy-service:
+    image: insurance-policies/policy-service
+    build: ./policy-service/
+    restart: on-failure
+    depends_on:
       - mongo
     links:
       - mongo
     ports:
-      - '8080:8080'
+      - '50051:50051'
     environment:
       MONGO_USERNAME: ${MONGO_USERNAME}
       MONGO_PASSWORD: ${MONGO_PASSWORD}
