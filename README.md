@@ -33,3 +33,4 @@ If you prefer not using Tilt, just install [Docker Compose](https://docs.docker.
 
 - **GIT Branching:** [GIT Flow branching model](http://nvie.com/posts/a-successful-git-branching-model/)
 - **Versioning:** [semantic versioning](http://semver.org/)
+- **Microservices:** [Protocol Buffers and gRPC](./protos)
