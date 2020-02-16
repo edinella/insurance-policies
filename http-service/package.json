@@ -1,5 +1,5 @@
 {
-  "name": "insurance-policies-graphql-service",
+  "name": "insurance-policies-http-service",
   "version": "0.1.0",
   "private": true,
   "scripts": {
