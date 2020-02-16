@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/policies', (req, res, next) => {
-  res.send('respond with policies');
+router.get('/', (req, res, next) => {
+  res.json([]);
 });
 
 module.exports = router;

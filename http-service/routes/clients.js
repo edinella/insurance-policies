@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/clients', (req, res, next) => {
-  res.send('respond with clients');
+router.get('/', (req, res, next) => {
+  res.json([]);
 });
 
 module.exports = router;

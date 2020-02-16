@@ -5,7 +5,8 @@
   "scripts": {
     "start": "./bin/www",
     "pretest": "npm install",
-    "test": "export $(xargs < ../.env); NODE_ENV=development; ./node_modules/.bin/jest"
+    "test": "export $(xargs < ../.env); NODE_ENV=development; ./node_modules/.bin/jest",
+    "test:watch": "export $(xargs < ../.env); NODE_ENV=development; ./node_modules/.bin/jest --watch"
   },
   "jest": {
     "testMatch": [
@@ -29,6 +30,7 @@
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.20.1",
     "jest": "^25.1.0",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "supertest": "^4.0.2"
   }
 }
