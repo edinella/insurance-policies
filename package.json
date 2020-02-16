@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "test-graphql-service": "cd ./graphql-service; npm test; cd ..",
-    "test": "npm run test-graphql-service"
+    "postinstall": "npm run i-graphql-service",
+    "i-graphql-service": "cd ./graphql-service; npm i; cd ..",
+    "t-graphql-service": "cd ./graphql-service; npm test; cd ..",
+    "test": "npm run t-graphql-service"
   }
 }
