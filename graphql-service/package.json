@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "start": "./bin/www.js",
     "pretest": "npm install",
     "test": "export $(xargs < ../.env); NODE_ENV=development; ./node_modules/.bin/jest"
   },
