@@ -1,0 +1,29 @@
+version: '3.7'
+services:
+  mongo:
+    image: mongo
+    restart: on-failure
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+    ports:
+      - '27017:27017'
+    volumes:
+      - db-data:/data/db
+  graphql-service:
+    image: insurance-policies/graphql-service
+    build: ./graphql-service/
+    restart: on-failure
+    depends_on:
+      - mongo
+    links:
+      - mongo
+    ports:
+      - '50051:50051'
+    environment:
+      MONGO_USERNAME: ${MONGO_USERNAME}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_DATABASE: ${MONGO_DATABASE}
+volumes:
+  db-data:
