@@ -1,2 +1,3 @@
 # insurance-policies
-Node.js API example
+
+This is an example of a application that manages some information regarding insurance policies and company clients.
