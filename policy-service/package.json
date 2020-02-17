@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "./bin/grpc",
+    "start": "./bin/ensure-initial-data ./bin/grpc",
     "pretest": "npm install",
     "test": "export $(xargs < ../.env); NODE_ENV=development; ./node_modules/.bin/jest",
     "test:watch": "export $(xargs < ../.env); NODE_ENV=development; ./node_modules/.bin/jest --watch"
@@ -18,7 +18,9 @@
   },
   "dependencies": {
     "debug": "^4.1.1",
-    "morgan": "^1.9.1"
+    "grpc": "^1.24.2",
+    "mongoose": "^5.9.1",
+    "require-directory": "^2.1.1"
   },
   "devDependencies": {
     "eslint": "^6.8.0",

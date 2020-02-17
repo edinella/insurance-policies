@@ -35,5 +35,6 @@ services:
       MONGO_USERNAME: ${MONGO_USERNAME}
       MONGO_PASSWORD: ${MONGO_PASSWORD}
       MONGO_DATABASE: ${MONGO_DATABASE}
+      MONGO_HOST: ${MONGO_HOST}
 volumes:
   db-data:

@@ -8,17 +8,17 @@ Choose one of this methods:
 
 #### Kubernetes with Tilt (recommended)
 
-Follow [Tilt](https://docs.tilt.dev/install.html) installation instructions, then run:
-
-- Start: `tilt up`
-- Stop: `tilt down`
+> Follow [Tilt](https://docs.tilt.dev/install.html) installation instructions, then run:
+>
+> - Start: `tilt up`
+> - Stop: `tilt down`
 
 #### Docker Compose
 
-If you prefer not using Tilt, just install [Docker Compose](https://docs.docker.com/compose/install/) and you are ready to go:
-
-- Start: `docker-compose up --build`
-- Stop: `docker-compose down`
+> If you prefer not using Tilt, just install [Docker Compose](https://docs.docker.com/compose/install/) and you are ready to go:
+>
+> - Start: `docker-compose up --build`
+> - Stop: `docker-compose down`
 
 ## Commands
 
