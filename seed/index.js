@@ -1,12 +1,11 @@
-#!/usr/bin/env node
+const debug = require("debug")("insurance-policies:seed-data");
+const mongoose = require("mongoose");
+const path = require("path");
+const fs = require("fs");
+require("../models");
 
-const debug = require('debug')('policy-service:ensure-initial-data');
-const mongoose = require('mongoose');
-const path = require('path');
-const fs = require('fs');
-require('../models');
-
-const Policy = mongoose.model('Policy');
+const Policy = mongoose.model("Policy");
+const policiesData = path.join(__dirname, "policies.json");
 
 // ckeck if data is already loaded
 Policy.findOne({}, (err, doc) => {
@@ -16,12 +15,12 @@ Policy.findOne({}, (err, doc) => {
   if (!doc) {
     loadInitialData();
   }
-  debug('DONE');
+  debug("DONE");
 });
 
 // loads data
 function loadInitialData() {
-  const rawdata = fs.readFileSync(path.join(__dirname, '../policies.json'));
+  const rawdata = fs.readFileSync(policiesData);
   const arr = JSON.parse(rawdata);
   const docs = arr.map(doc => {
     doc._id = doc.id;
@@ -31,6 +30,6 @@ function loadInitialData() {
     if (err) {
       throw err;
     }
-    debug('DATA LOADED');
+    debug("DATA LOADED");
   });
 }

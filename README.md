@@ -22,15 +22,14 @@ Choose one of this methods:
 
 ## Commands
 
-| Command       | What it does                 |
-| ------------- | ---------------------------- |
-| `npm install` | Installs all microservices   |
-| `tilt up`     | Starts all microservices     |
-| `tilt down`   | Stops all microservices      |
-| `npm test`    | Runs all microservices tests |
+| Command       | What it does              |
+| ------------- | ------------------------- |
+| `npm install` | Installs api dependencies |
+| `npm test`    | Runs api tests            |
+| `tilt up`     | Starts all services       |
+| `tilt down`   | Stops all services        |
 
 ## Conventions
 
 - **GIT Branching:** [GIT Flow branching model](http://nvie.com/posts/a-successful-git-branching-model/)
 - **Versioning:** [semantic versioning](http://semver.org/)
-- **Microservices:** [Protocol Buffers and gRPC](./protos)

@@ -11,26 +11,16 @@ services:
       - '27017:27017'
     volumes:
       - db-data:/data/db
-  http-service:
-    image: insurance-policies/http-service
-    build: ./http-service/
+  api:
+    image: api
+    build: ./
     restart: on-failure
     depends_on:
-      - policy-service
+      - mongo
     links:
-      - policy-service
+      - mongo
     ports:
       - '8080:8080'
-  policy-service:
-    image: insurance-policies/policy-service
-    build: ./policy-service/
-    restart: on-failure
-    depends_on:
-      - mongo
-    links:
-      - mongo
-    ports:
-      - '50051:50051'
     environment:
       MONGO_USERNAME: ${MONGO_USERNAME}
       MONGO_PASSWORD: ${MONGO_PASSWORD}

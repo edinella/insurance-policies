@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const debug = require('debug')('policy-service:models');
+const debug = require('debug')('http-service:models');
 const requireDirectory = require('require-directory');
 
 module.exports = requireDirectory(module, { recurse: false });
