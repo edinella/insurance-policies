@@ -1,35 +1,35 @@
-const debug = require("debug")("insurance-policies:seed-data");
-const mongoose = require("mongoose");
-const path = require("path");
-const fs = require("fs");
-require("../models");
+const debug = require('debug')('insurance-policies:seed-data');
+const mongoose = require('mongoose');
+const path = require('path');
+const fs = require('fs');
+require('../models');
 
-const Policy = mongoose.model("Policy");
-const policiesData = path.join(__dirname, "policies.json");
+async function main() {
+  const entities = [
+    ['Policy', 'policies.json'],
+    ['Client', 'clients.json']
+  ].map(args => seed(...args));
+  return Promise.all(entities);
+}
 
-// ckeck if data is already loaded
-Policy.findOne({}, (err, doc) => {
-  if (err) {
-    throw err;
-  }
+main()
+  .then(v => console.log('SEED DONE'))
+  .catch(err => console.error(err));
+
+async function seed(modelName, fileName) {
+  const Model = mongoose.model(modelName);
+  const doc = await Model.findOne({});
   if (!doc) {
-    loadInitialData();
+    debug(`${modelName} will be seeded`);
+    const arr = JSON.parse(fs.readFileSync(path.join(__dirname, fileName)));
+    const docs = arr.map(doc => {
+      doc._id = doc.id;
+      return doc;
+    });
+    const result = Model.insertMany(docs);
+    debug(`${modelName} seeded`);
+    return result;
+  } else {
+    debug(`${modelName} already seeded`);
   }
-  debug("DONE");
-});
-
-// loads data
-function loadInitialData() {
-  const rawdata = fs.readFileSync(policiesData);
-  const arr = JSON.parse(rawdata);
-  const docs = arr.map(doc => {
-    doc._id = doc.id;
-    return doc;
-  });
-  Policy.insertMany(docs, function(err, docs) {
-    if (err) {
-      throw err;
-    }
-    debug("DATA LOADED");
-  });
 }
