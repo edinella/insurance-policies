@@ -1,0 +1,20 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='https://unpkg.com/spectre.css/dist/spectre.min.css')
+    link(rel='stylesheet', href='https://unpkg.com/spectre.css/dist/spectre-icons.min.css')
+    link(rel='stylesheet', href='stylesheets/style.css')
+  body
+    .container.grid-xs
+      .columns
+        .column
+          .hero.hero-sm
+            .hero-body
+              h1 Welcome!
+              p This is a example        
+          header.navbar
+            section.navbar-section
+              a(href='/' title='').navbar-brand.mr-2.text-bold Insurance Policies Example
+          .divider
+          block content
