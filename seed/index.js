@@ -1,35 +1,61 @@
-const debug = require('debug')('insurance-policies:seed-data');
 const mongoose = require('mongoose');
+const { promisify } = require('util');
+const argon2i = require('argon2-ffi').argon2i;
+const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
 require('../lib/models');
+
+const randomBytes = promisify(crypto.randomBytes);
 
 main()
   .then(v => console.log('SEED DONE'))
   .catch(err => console.error(err));
 
 async function main() {
-  const entities = [
-    ['Policy', 'policies.json'],
-    ['Client', 'clients.json']
-  ].map(args => seed(...args));
-  return Promise.all(entities);
+  return Promise.all([seedPolicies(), seedClients()]);
 }
 
-async function seed(modelName, fileName) {
-  const Model = mongoose.model(modelName);
-  const doc = await Model.findOne({});
+async function seedPolicies() {
+  const Policy = mongoose.model('Policy');
+  const doc = await Policy.findOne({});
   if (!doc) {
-    debug(`${modelName} will be seeded`);
-    const arr = JSON.parse(fs.readFileSync(path.join(__dirname, fileName)));
+    console.log('Started seeding Policy');
+    const filePath = path.join(__dirname, 'policies.json');
+    const arr = JSON.parse(fs.readFileSync(filePath));
     const docs = arr.map(doc => {
       doc._id = doc.id;
       return doc;
     });
-    const result = Model.insertMany(docs);
-    debug(`${modelName} seeded`);
+    const result = Policy.insertMany(docs);
+    console.log('Finished seeding Policy');
     return result;
   } else {
-    debug(`${modelName} already seeded`);
+    console.log('No need for seeding Policy');
+  }
+}
+
+async function seedClients() {
+  const Client = mongoose.model('Client');
+  const doc = await Client.findOne({});
+  if (!doc) {
+    console.log('Started seeding Client');
+    const filePath = path.join(__dirname, 'clients.json');
+    const arr = JSON.parse(fs.readFileSync(filePath));
+    const docs = await Promise.all(
+      arr.map(async doc => {
+        doc._id = doc.id;
+
+        // for this example, the password will be the username of email
+        const pwd = doc.email.split('@')[0];
+        doc.pwd = await randomBytes(32).then(salt => argon2i.hash(pwd, salt));
+        return doc;
+      })
+    );
+    const result = Client.insertMany(docs);
+    console.log('Finished seeding Client');
+    return result;
+  } else {
+    console.log('No need for seeding Client');
   }
 }
