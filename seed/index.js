@@ -2,7 +2,11 @@ const debug = require('debug')('insurance-policies:seed-data');
 const mongoose = require('mongoose');
 const path = require('path');
 const fs = require('fs');
-require('../models');
+require('../lib/models');
+
+main()
+  .then(v => console.log('SEED DONE'))
+  .catch(err => console.error(err));
 
 async function main() {
   const entities = [
@@ -11,10 +15,6 @@ async function main() {
   ].map(args => seed(...args));
   return Promise.all(entities);
 }
-
-main()
-  .then(v => console.log('SEED DONE'))
-  .catch(err => console.error(err));
 
 async function seed(modelName, fileName) {
   const Model = mongoose.model(modelName);
