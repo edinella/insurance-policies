@@ -1,15 +1,20 @@
+#!/usr/bin/env node
+
+require('../lib/models');
 const mongoose = require('mongoose');
 const { promisify } = require('util');
 const argon2i = require('argon2-ffi').argon2i;
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
-require('../lib/models');
 
 const randomBytes = promisify(crypto.randomBytes);
 
 main()
-  .then(v => console.log('SEED DONE'))
+  .then(v => {
+    console.log('SEEDING DONE');
+    process.exit();
+  })
   .catch(err => console.error(err));
 
 async function main() {
@@ -21,7 +26,7 @@ async function seedPolicies() {
   const doc = await Policy.findOne({});
   if (!doc) {
     console.log('Started seeding Policy');
-    const filePath = path.join(__dirname, 'policies.json');
+    const filePath = path.join(__dirname, '../seed/policies.json');
     const arr = JSON.parse(fs.readFileSync(filePath));
     const docs = arr.map(doc => {
       doc._id = doc.id;
@@ -40,7 +45,7 @@ async function seedClients() {
   const doc = await Client.findOne({});
   if (!doc) {
     console.log('Started seeding Client');
-    const filePath = path.join(__dirname, 'clients.json');
+    const filePath = path.join(__dirname, '../seed/clients.json');
     const arr = JSON.parse(fs.readFileSync(filePath));
     const docs = await Promise.all(
       arr.map(async doc => {
