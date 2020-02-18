@@ -33,3 +33,13 @@ Choose one of this methods:
 
 - **GIT Branching:** [GIT Flow branching model](http://nvie.com/posts/a-successful-git-branching-model/)
 - **Versioning:** [semantic versioning](http://semver.org/)
+
+## REST API
+
+Login
+
+```sh
+curl -H "Content-Type: application/json" -X POST \
+  -d '{"email":"manningblankenship@quotezart.com","password":"manningblankenship"}' \
+  http://localhost:8080/login
+```

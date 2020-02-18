@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+require('../lib/models'); // connect to database
+
 const app = require('../lib/app');
 const debug = require('debug')('http-service:server');
 const http = require('http');
