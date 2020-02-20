@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-require('../lib/models'); // connect to database
-
+require('../lib/db');
+require('../lib/models');
 const mongoose = require('mongoose');
 const { promisify } = require('util');
 const argon2i = require('argon2-ffi').argon2i;
