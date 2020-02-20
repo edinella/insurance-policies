@@ -3,13 +3,9 @@
 require('../lib/db');
 require('../lib/models');
 const mongoose = require('mongoose');
-const { promisify } = require('util');
-const argon2i = require('argon2-ffi').argon2i;
-const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
-
-const randomBytes = promisify(crypto.randomBytes);
+const hash = require('../lib/hash');
 
 main()
   .then(v => {
@@ -54,7 +50,7 @@ async function seedClients() {
 
         // for this example, the password will be the username of email
         const pwd = doc.email.split('@')[0];
-        doc.pwd = await randomBytes(32).then(salt => argon2i.hash(pwd, salt));
+        doc.pwd = await hash.generate(pwd);
         return doc;
       })
     );

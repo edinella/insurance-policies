@@ -1,4 +1,5 @@
-require('../setupTests');
+jest.useFakeTimers();
+jest.mock('mongoose');
 const app = require('supertest')(require('../../lib/app'));
 
 describe('GET /', () => {
