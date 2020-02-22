@@ -7,7 +7,7 @@
     "seed": "./bin/seed",
     "pretest": "npm install",
     "test": "export $(xargs < .env); NODE_ENV=development; ./node_modules/.bin/jest",
-    "test:watch": "export $(xargs < .env); NODE_ENV=development; MONGO_HOST=localhost; MONGO_DATABASE=test; ./node_modules/.bin/jest --watch"
+    "test:watch": "export $(xargs < .env); NODE_ENV=development; MONGO_HOST=localhost; MONGO_DATABASE=test; ./node_modules/.bin/jest --watch --runInBand --detectOpenHandles"
   },
   "jest": {
     "testEnvironment": "node",
