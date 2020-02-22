@@ -12,3 +12,5 @@ async function hash(buf, salt) {
 async function verify(hashed, buf) {
   return Promise.resolve(hashed === buf.toString());
 }
+
+// https://github.com/facebook/jest/issues/3552
