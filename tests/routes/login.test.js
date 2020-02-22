@@ -3,6 +3,7 @@ require('../../lib/models');
 
 const supertest = require('supertest');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 
 const hash = require('../../lib/hash');
 const app = supertest(require('../../lib/app'));
@@ -38,7 +39,7 @@ describe('POST /login', () => {
   describe('with credentials,', () => {
     beforeEach(async () => {
       const pwd = await hash.generate('a');
-      const doc = new Client({ _id: 'a', email: 'a@a.a', pwd });
+      const doc = new Client({ _id: 'a', email: 'a@a.a', pwd, role: 'user' });
       await doc.save();
     });
     afterEach(async () => {
@@ -56,11 +57,14 @@ describe('POST /login', () => {
         .send({ email: 'a@a.a', password: 'x' });
       expect(res.status).toBe(401);
     });
-    it('with correct password should return 200', async () => {
+    it('with correct password should return 200 with a valid JWT token', async () => {
       const res = await app
         .post('/login')
         .send({ email: 'a@a.a', password: 'a' });
       expect(res.status).toBe(200);
+      const decoded = jwt.verify(res.body.token, process.env.JWT_SECRET);
+      expect(decoded.data.id).toBe('a');
+      expect(decoded.data.role).toBe('user');
     });
   });
 });
