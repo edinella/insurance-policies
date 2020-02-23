@@ -1,20 +1,10 @@
-require('../../lib/db');
-require('../../lib/models');
-
 const supertest = require('supertest');
-const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 
+jest.mock('../../lib/models');
+const { Client } = require('../../lib/models');
 const hash = require('../../lib/hash');
 const app = supertest(require('../../lib/app'));
-const Client = mongoose.model('Client');
-
-afterAll(done => {
-  setTimeout(() => {
-    mongoose.connection.close();
-    done();
-  }, 100);
-});
 
 describe('GET /login', () => {
   it('should return a page', async () => {
@@ -37,14 +27,14 @@ describe('POST /login', () => {
     expect(res.status).toBe(400);
   });
   describe('with credentials,', () => {
+    beforeAll(() => Client.base.connect());
+    afterAll(() => Client.base.disconnect());
     beforeEach(async () => {
       const pwd = await hash.generate('a');
       const doc = new Client({ _id: 'a', email: 'a@a.a', pwd, role: 'user' });
       await doc.save();
     });
-    afterEach(async () => {
-      await Client.deleteMany();
-    });
+    afterEach(async () => await Client.deleteMany());
     it('with unknown email should return 401', async () => {
       const res = await app
         .post('/login')
