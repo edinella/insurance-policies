@@ -11,9 +11,9 @@ services:
       - '27017:27017'
     volumes:
       - db-data:/data/db
-  http-service:
-    image: insurance-policies/http-service
-    build: ./http-service/
+  api:
+    image: api
+    build: ./
     restart: on-failure
     depends_on:
       - mongo
@@ -25,5 +25,7 @@ services:
       MONGO_USERNAME: ${MONGO_USERNAME}
       MONGO_PASSWORD: ${MONGO_PASSWORD}
       MONGO_DATABASE: ${MONGO_DATABASE}
+      MONGO_HOST: ${MONGO_HOST}
+      JWT_SECRET: ${JWT_SECRET}
 volumes:
   db-data:
