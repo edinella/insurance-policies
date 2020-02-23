@@ -10,47 +10,76 @@ let login = async (email, password) => {
   return (await app.post('/login').send({ email, password })).body.token;
 };
 
+beforeAll(async () => {
+  await Client.base.connect();
+  await Client.insertMany([
+    {
+      _id: 'a0ece5db-cd14-4f21-812f-966633e7be86',
+      name: 'Britney',
+      email: 'admin@a.a',
+      role: 'admin',
+      pwd: await hash.generate('adminPass')
+    },
+    {
+      _id: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb',
+      name: 'Manning',
+      email: 'user@u.u',
+      role: 'user',
+      pwd: await hash.generate('userPass')
+    }
+  ]);
+  await Policy.insertMany([
+    {
+      _id: '56b415d6-53ee-4481-994f-4bffa47b5239',
+      clientId: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb'
+    },
+    {
+      _id: '64cceef9-3a01-49ae-a23b-3761b604800b',
+      clientId: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb'
+    },
+    {
+      _id: '7b624ed3-00d5-4c1b-9ab8-c265067ef58b',
+      clientId: 'a0ece5db-cd14-4f21-812f-966633e7be86'
+    }
+  ]);
+  userToken = await login('user@u.u', 'userPass');
+  adminToken = await login('admin@a.a', 'adminPass');
+});
+afterAll(async () => {
+  await Client.deleteMany();
+  await Policy.deleteMany();
+  await Client.base.disconnect();
+});
+
+describe('GET /policies/:id', () => {
+  it('should get policy details', async () => {
+    const res = await app
+      .get('/policies/64cceef9-3a01-49ae-a23b-3761b604800b')
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      id: '64cceef9-3a01-49ae-a23b-3761b604800b',
+      clientId: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb'
+    });
+  });
+});
+
+describe('GET /policies/:id/client', () => {
+  it('should get client details by policy id', async () => {
+    const res = await app
+      .get('/policies/64cceef9-3a01-49ae-a23b-3761b604800b/client')
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      id: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb',
+      name: 'Manning',
+      email: 'user@u.u',
+      role: 'user'
+    });
+  });
+});
+
 describe('GET /policies', () => {
-  beforeAll(async () => {
-    await Client.base.connect();
-    await Client.insertMany([
-      {
-        _id: 'a0ece5db-cd14-4f21-812f-966633e7be86',
-        name: 'Britney',
-        email: 'admin@a.a',
-        role: 'admin',
-        pwd: await hash.generate('adminPass')
-      },
-      {
-        _id: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb',
-        name: 'Manning',
-        email: 'user@u.u',
-        role: 'user',
-        pwd: await hash.generate('userPass')
-      }
-    ]);
-    await Policy.insertMany([
-      {
-        _id: '56b415d6-53ee-4481-994f-4bffa47b5239',
-        clientId: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb'
-      },
-      {
-        _id: '64cceef9-3a01-49ae-a23b-3761b604800b',
-        clientId: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb'
-      },
-      {
-        _id: '7b624ed3-00d5-4c1b-9ab8-c265067ef58b',
-        clientId: 'a0ece5db-cd14-4f21-812f-966633e7be86'
-      }
-    ]);
-    userToken = await login('user@u.u', 'userPass');
-    adminToken = await login('admin@a.a', 'adminPass');
-  });
-  afterAll(async () => {
-    await Client.deleteMany();
-    await Policy.deleteMany();
-    await Client.base.disconnect();
-  });
   it('should respond 401 without credentials', async () => {
     const res = await app.get('/policies');
     expect(res.status).toBe(401);
