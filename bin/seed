@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 require('../lib/db');
-require('../lib/models');
 const mongoose = require('mongoose');
 const path = require('path');
 const fs = require('fs');
