@@ -56,8 +56,8 @@ describe('POST /login', () => {
         .send({ email: 'a@a.a', password: 'a' });
       expect(res.status).toBe(200);
       const decoded = jwt.verify(res.body.token, process.env.JWT_SECRET);
-      expect(decoded.data.id).toBe('a');
-      expect(decoded.data.role).toBe('user');
+      expect(decoded.id).toBe('a');
+      expect(decoded.role).toBe('user');
     });
   });
 });
