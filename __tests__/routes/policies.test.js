@@ -15,7 +15,8 @@ beforeAll(async () => {
   await Policy.insertMany([
     { _id: 'P1', clientId: 'C2' },
     { _id: 'P2', clientId: 'C2' },
-    { _id: 'P3', clientId: 'C1' }
+    { _id: 'P3', clientId: 'C1' },
+    { _id: 'orphan', clientId: 'C3' }
   ]);
 });
 afterAll(async () => {
@@ -88,6 +89,16 @@ describe('GET /policies/:id/client', () => {
       role: 'user'
     });
   });
+  it('should respond 404 if policy not exists', async () => {
+    auth.mockImplementationOnce(authWithRole('admin'));
+    const res = await app.get('/policies/none/client');
+    expect(res.status).toBe(404);
+  });
+  it('should respond 404 if client not exists', async () => {
+    auth.mockImplementationOnce(authWithRole('admin'));
+    const res = await app.get('/policies/orphan/client');
+    expect(res.status).toBe(404);
+  });
 });
 
 describe('GET /policies', () => {
@@ -117,7 +128,8 @@ describe('GET /policies', () => {
     expect(res.body).toEqual([
       { clientId: 'C2', id: 'P1' },
       { clientId: 'C2', id: 'P2' },
-      { clientId: 'C1', id: 'P3' }
+      { clientId: 'C1', id: 'P3' },
+      { clientId: 'C3', id: 'orphan' }
     ]);
   });
   it('should filter by clientName', async () => {

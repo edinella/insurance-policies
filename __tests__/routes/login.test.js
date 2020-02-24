@@ -31,17 +31,17 @@ describe('POST /login', () => {
       await Client.deleteMany();
       await Client.base.disconnect();
     });
-    it('with unknown email should return 401', async () => {
+    it('with unknown email should return 400', async () => {
       const res = await app
         .post('/login')
         .send({ email: 'a@b.c', password: 'x' });
-      expect(res.status).toBe(401);
+      expect(res.status).toBe(400);
     });
-    it('with wrong password should return 401', async () => {
+    it('with wrong password should return 400', async () => {
       const res = await app
         .post('/login')
         .send({ email: 'a@a.a', password: 'x' });
-      expect(res.status).toBe(401);
+      expect(res.status).toBe(400);
     });
     it('with correct password should return 200 with a valid JWT token', async () => {
       const res = await app
