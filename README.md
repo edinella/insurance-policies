@@ -37,6 +37,7 @@ Choose one of this methods:
 ## REST API
 
 This application provides HTTP routes representing entities you can query on.
+All requests and responses content are in JSON format, utf8.
 
 ### Credentials
 
@@ -70,11 +71,56 @@ curl \
 
 ### Available routes
 
-| Route                             | Roles allowed | Description                                   |
-| --------------------------------- | ------------- | --------------------------------------------- |
-| GET /policies                     | admin         | Get list of policies                          |
-| GET /policies?clientName=`John`   | admin         | Get list of policies linked to a client name  |
-| GET /policies?clientEmail=`a@a.a` | admin         | Get list of policies linked to a client email |
-| GET /policies?clientId=`id`       | admin         | Get list of policies linked to a client ID    |
-| GET /policies/`id`                | admin         | Get details of a policy by ID                 |
-| GET /policies/`id`/client         | admin         | Get client details of a policy by ID          |
+| Route                             | Roles allowed    | Description                                          |
+| --------------------------------- | ---------------- | ---------------------------------------------------- |
+| POST /login                       | _not applicable_ | Get a token                                          |
+| GET /policies                     | `admin`          | Get list of policies                                 |
+| GET /policies?clientName=NAME     | `admin`          | Get list of policies linked to a client name         |
+| GET /policies?clientNameLike=NAME | `admin`          | Get list of policies linked to a client partial name |
+| GET /policies?clientEmail=EMAIL   | `admin`          | Get list of policies linked to a client email        |
+| GET /policies?clientId=ID         | `admin`          | Get list of policies linked to a client ID           |
+| GET /policies/ID                  | `admin`          | Get details of a policy by ID                        |
+| GET /policies/ID/client           | `admin`          | Get client details of a policy by ID                 |
+| GET /clients/ID                   | `admin`, `user`  | Get client details by ID                             |
+| GET /clients                      | `admin`, `user`  | Get list of clients                                  |
+| GET /clients?name=NAME            | `admin`, `user`  | Get list of clients filtered by name                 |
+| GET /clients?nameLike=NAME        | `admin`, `user`  | Get list of clients filtered by partial name         |
+
+> The name filters are exact-matching. If you prefer, use the "like" variation, for partial and case-tolerant matching.
+
+### List pagination
+
+All lists are limited by default on 1000 items. You can paginate more items using the [Range Header](http://otac0n.com/blog/2012/11/21/range-header-i-choose-you.html). Please note that the first item is zero.
+
+##### Getting the first 1000 items
+
+Request:
+
+```
+GET /policies
+```
+
+Response:
+
+```
+200 OK
+Accept-Ranges: items
+Content-Range: items 0-999/*
+```
+
+##### Getting the next 1000 items
+
+Request:
+
+```
+GET /policies
+Range: items=1000-1999
+```
+
+Response:
+
+```
+206 Partial Content
+Accept-Ranges: items
+Content-Range: items 1000-1999/*
+```

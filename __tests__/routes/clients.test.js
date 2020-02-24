@@ -98,4 +98,12 @@ describe('GET /clients', () => {
       { id: 'C2', name: 'Name B', email: 'b@mail', role: 'user' }
     ]);
   });
+  it('should get a list of clients filtered by partial name', async () => {
+    auth.mockImplementationOnce(authWithRole('admin'));
+    const res = await app.get('/clients?nameLike=b');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([
+      { id: 'C2', name: 'Name B', email: 'b@mail', role: 'user' }
+    ]);
+  });
 });

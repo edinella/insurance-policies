@@ -7,13 +7,6 @@ const { Client } = require('../../lib/models');
 const hash = require('../../lib/hash');
 const app = supertest(require('../../lib/app'));
 
-describe('GET /login', () => {
-  it('should return a page', async () => {
-    const res = await app.get('/');
-    expect(res.status).toBe(200);
-    expect(res.header['content-type']).toBe('text/html; charset=utf-8');
-  });
-});
 describe('POST /login', () => {
   it('missing credentials should return 400', async () => {
     const res = await app.post('/login');

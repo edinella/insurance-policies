@@ -129,6 +129,15 @@ describe('GET /policies', () => {
       { id: 'P2', clientId: 'C2' }
     ]);
   });
+  it('should filter by partial clientName', async () => {
+    auth.mockImplementationOnce(authWithRole('admin'));
+    const res = await app.get('/policies?clientNameLike=2');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([
+      { id: 'P1', clientId: 'C2' },
+      { id: 'P2', clientId: 'C2' }
+    ]);
+  });
   it('should filter by clientEmail', async () => {
     auth.mockImplementationOnce(authWithRole('admin'));
     const res = await app.get('/policies?clientEmail=1@mail');
