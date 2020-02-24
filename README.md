@@ -86,13 +86,13 @@ curl \
 | GET /clients?name=NAME            | `admin`, `user`  | Get list of clients filtered by name                 |
 | GET /clients?nameLike=NAME        | `admin`, `user`  | Get list of clients filtered by partial name         |
 
-> The name filters are exact-matching. If you prefer, use the "like" variation, for partial and case-tolerant matching.
+> The "name" filters are exact-matching. If you prefer, use the "like" variation, for partial and case-tolerant matching.
 
 ### List pagination
 
 All lists are limited by default on 1000 items. You can paginate more items using the [Range Header](http://otac0n.com/blog/2012/11/21/range-header-i-choose-you.html). Please note that the first item is zero.
 
-##### Getting the first 1000 items
+#### Getting the first 1000 items
 
 Request:
 
@@ -108,7 +108,7 @@ Accept-Ranges: items
 Content-Range: items 0-999/*
 ```
 
-##### Getting the next 1000 items
+#### Getting the next 1000 items
 
 Request:
 
