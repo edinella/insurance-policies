@@ -1,0 +1,39 @@
+{
+  "name": "insurance-policies",
+  "version": "1.0.0",
+  "private": true,
+  "author": "Ezequias Dinella",
+  "scripts": {
+    "start": "./bin/seed; ./bin/www",
+    "seed": "./bin/seed",
+    "pretest": "npm install",
+    "test": "export $(xargs < .env); NODE_ENV=development; ./node_modules/.bin/jest",
+    "test:cov": "export $(xargs < .env); NODE_ENV=development; ./node_modules/.bin/jest --coverage",
+    "test:watch": "export $(xargs < .env); NODE_ENV=development; MONGO_HOST=localhost; MONGO_DATABASE=test; ./node_modules/.bin/jest --watch"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "prettier": {
+    "singleQuote": true
+  },
+  "dependencies": {
+    "argon2-ffi": "^1.1.2",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.4",
+    "express": "^4.17.1",
+    "express-jwt": "^5.3.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.1",
+    "morgan": "^1.9.1"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.1",
+    "jest": "^25.1.0",
+    "mongodb-memory-server": "^6.2.4",
+    "prettier": "^1.19.1",
+    "supertest": "^4.0.2"
+  }
+}
