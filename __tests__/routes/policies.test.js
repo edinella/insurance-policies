@@ -1,49 +1,22 @@
 jest.mock('../../lib/models');
+jest.mock('../../lib/middlewares/auth');
 
 const supertest = require('supertest');
 const { Client, Policy } = require('../../lib/models');
-const hash = require('../../lib/hash');
+const auth = require('../../lib/middlewares/auth');
 const app = supertest(require('../../lib/app'));
-let userToken;
-let adminToken;
-let login = async (email, password) => {
-  return (await app.post('/login').send({ email, password })).body.token;
-};
 
 beforeAll(async () => {
   await Client.base.connect();
   await Client.insertMany([
-    {
-      _id: 'a0ece5db-cd14-4f21-812f-966633e7be86',
-      name: 'Britney',
-      email: 'admin@a.a',
-      role: 'admin',
-      pwd: await hash.generate('adminPass')
-    },
-    {
-      _id: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb',
-      name: 'Manning',
-      email: 'user@u.u',
-      role: 'user',
-      pwd: await hash.generate('userPass')
-    }
+    { _id: 'C1', name: 'N1', email: '1@mail', role: 'admin', pwd: 'x' },
+    { _id: 'C2', name: 'N2', email: '2@mail', role: 'user', pwd: 'x' }
   ]);
   await Policy.insertMany([
-    {
-      _id: '56b415d6-53ee-4481-994f-4bffa47b5239',
-      clientId: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb'
-    },
-    {
-      _id: '64cceef9-3a01-49ae-a23b-3761b604800b',
-      clientId: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb'
-    },
-    {
-      _id: '7b624ed3-00d5-4c1b-9ab8-c265067ef58b',
-      clientId: 'a0ece5db-cd14-4f21-812f-966633e7be86'
-    }
+    { _id: 'P1', clientId: 'C2' },
+    { _id: 'P2', clientId: 'C2' },
+    { _id: 'P3', clientId: 'C1' }
   ]);
-  userToken = await login('user@u.u', 'userPass');
-  adminToken = await login('admin@a.a', 'adminPass');
 });
 afterAll(async () => {
   await Client.deleteMany();
@@ -51,29 +24,67 @@ afterAll(async () => {
   await Client.base.disconnect();
 });
 
+const authWithRole = role => (req, res, next) => {
+  req.token = { role };
+  next();
+};
+
 describe('GET /policies/:id', () => {
+  it('should respond 401 without credentials', async () => {
+    const res = await app.get('/policies/1');
+    expect(res.status).toBe(401);
+  });
+  it('should respond 403 if role doesn`t matches', async () => {
+    auth.mockImplementationOnce(authWithRole('mistery'));
+    const res = await app.get('/policies/1');
+    expect(res.status).toBe(403);
+  });
+  it('should respond 403 if role is "user"', async () => {
+    auth.mockImplementationOnce(authWithRole('user'));
+    const res = await app.get('/policies/1');
+    expect(res.status).toBe(403);
+  });
+  it('should not respond 403 if role is "admin"', async () => {
+    auth.mockImplementationOnce(authWithRole('admin'));
+    const res = await app.get('/policies/1');
+    expect(res.status).not.toBe(403);
+  });
   it('should get policy details', async () => {
-    const res = await app
-      .get('/policies/64cceef9-3a01-49ae-a23b-3761b604800b')
-      .set('Authorization', `Bearer ${adminToken}`);
+    auth.mockImplementationOnce(authWithRole('admin'));
+    const res = await app.get('/policies/P2');
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({
-      id: '64cceef9-3a01-49ae-a23b-3761b604800b',
-      clientId: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb'
-    });
+    expect(res.body).toEqual({ id: 'P2', clientId: 'C2' });
   });
 });
 
 describe('GET /policies/:id/client', () => {
+  it('should respond 401 without credentials', async () => {
+    const res = await app.get('/policies/P1/client');
+    expect(res.status).toBe(401);
+  });
+  it('should respond 403 if role doesn`t matches', async () => {
+    auth.mockImplementationOnce(authWithRole('mistery'));
+    const res = await app.get('/policies/P1/client');
+    expect(res.status).toBe(403);
+  });
+  it('should respond 403 if role is "user"', async () => {
+    auth.mockImplementationOnce(authWithRole('user'));
+    const res = await app.get('/policies/P1/client');
+    expect(res.status).toBe(403);
+  });
+  it('should not respond 403 if role is "admin"', async () => {
+    auth.mockImplementationOnce(authWithRole('admin'));
+    const res = await app.get('/policies/P1/client');
+    expect(res.status).not.toBe(403);
+  });
   it('should get client details by policy id', async () => {
-    const res = await app
-      .get('/policies/64cceef9-3a01-49ae-a23b-3761b604800b/client')
-      .set('Authorization', `Bearer ${adminToken}`);
+    auth.mockImplementationOnce(authWithRole('admin'));
+    const res = await app.get('/policies/P2/client');
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
-      id: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb',
-      name: 'Manning',
-      email: 'user@u.u',
+      id: 'C2',
+      name: 'N2',
+      email: '2@mail',
       role: 'user'
     });
   });
@@ -84,70 +95,50 @@ describe('GET /policies', () => {
     const res = await app.get('/policies');
     expect(res.status).toBe(401);
   });
-  it('should respond 403 to "user" role user', async () => {
-    const res = await app
-      .get('/policies')
-      .set('Authorization', `Bearer ${userToken}`);
+  it('should respond 403 if role doesn`t matches', async () => {
+    auth.mockImplementationOnce(authWithRole('mistery'));
+    const res = await app.get('/policies');
     expect(res.status).toBe(403);
   });
+  it('should respond 403 if role is "user"', async () => {
+    auth.mockImplementationOnce(authWithRole('user'));
+    const res = await app.get('/policies');
+    expect(res.status).toBe(403);
+  });
+  it('should not respond 403 if role is "admin"', async () => {
+    auth.mockImplementationOnce(authWithRole('admin'));
+    const res = await app.get('/policies');
+    expect(res.status).not.toBe(403);
+  });
   it('should list array of policies', async () => {
-    const res = await app
-      .get('/policies')
-      .set('Authorization', `Bearer ${adminToken}`);
+    auth.mockImplementationOnce(authWithRole('admin'));
+    const res = await app.get('/policies');
     expect(res.status).toBe(200);
     expect(res.body).toEqual([
-      {
-        clientId: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb',
-        id: '56b415d6-53ee-4481-994f-4bffa47b5239'
-      },
-      {
-        clientId: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb',
-        id: '64cceef9-3a01-49ae-a23b-3761b604800b'
-      },
-      {
-        clientId: 'a0ece5db-cd14-4f21-812f-966633e7be86',
-        id: '7b624ed3-00d5-4c1b-9ab8-c265067ef58b'
-      }
+      { clientId: 'C2', id: 'P1' },
+      { clientId: 'C2', id: 'P2' },
+      { clientId: 'C1', id: 'P3' }
     ]);
   });
   it('should filter by clientName', async () => {
-    const res = await app
-      .get('/policies?clientName=Manning')
-      .set('Authorization', `Bearer ${adminToken}`);
+    auth.mockImplementationOnce(authWithRole('admin'));
+    const res = await app.get('/policies?clientName=N2');
     expect(res.status).toBe(200);
     expect(res.body).toEqual([
-      {
-        id: '56b415d6-53ee-4481-994f-4bffa47b5239',
-        clientId: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb'
-      },
-      {
-        id: '64cceef9-3a01-49ae-a23b-3761b604800b',
-        clientId: 'e8fd159b-57c4-4d36-9bd7-a59ca13057bb'
-      }
+      { id: 'P1', clientId: 'C2' },
+      { id: 'P2', clientId: 'C2' }
     ]);
   });
   it('should filter by clientEmail', async () => {
-    const res = await app
-      .get('/policies?clientEmail=admin@a.a')
-      .set('Authorization', `Bearer ${adminToken}`);
+    auth.mockImplementationOnce(authWithRole('admin'));
+    const res = await app.get('/policies?clientEmail=1@mail');
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([
-      {
-        id: '7b624ed3-00d5-4c1b-9ab8-c265067ef58b',
-        clientId: 'a0ece5db-cd14-4f21-812f-966633e7be86'
-      }
-    ]);
+    expect(res.body).toEqual([{ id: 'P3', clientId: 'C1' }]);
   });
   it('should filter by clientId', async () => {
-    const res = await app
-      .get('/policies?clientId=a0ece5db-cd14-4f21-812f-966633e7be86')
-      .set('Authorization', `Bearer ${adminToken}`);
+    auth.mockImplementationOnce(authWithRole('admin'));
+    const res = await app.get('/policies?clientId=C1');
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([
-      {
-        id: '7b624ed3-00d5-4c1b-9ab8-c265067ef58b',
-        clientId: 'a0ece5db-cd14-4f21-812f-966633e7be86'
-      }
-    ]);
+    expect(res.body).toEqual([{ id: 'P3', clientId: 'C1' }]);
   });
 });
